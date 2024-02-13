@@ -31,8 +31,8 @@
                     <div class="mb-3">
                         <label for="status" class="form-label">Status</label>
                         <select class="form-control" name="status" value="{{old('status',$data->status)}}">
-                            <option value="invalid">Invalid</option>
-                            <option value="active">Active</option>
+                            <option value="Invalid">Invalid</option>
+                            <option value="Active">Active</option>
                         </select>
                         @error('status')
                         <div class="alert alert-danger mt-2">{{ $message }}</div>@enderror

@@ -53,6 +53,7 @@
 
                                 {{--                                <a class="btn btn-info" href="{{route('register',$d->id)}}">Detail</a>--}}
                                 <a class="btn btn-primary" href="{{route('edit.user',$d->id)}}">Edit</a>
+                                <a class="btn btn-info" href="{{route('profile.check',$d->id)}}">Profile</a>
                             </div>
                         </td>
                     </tr>

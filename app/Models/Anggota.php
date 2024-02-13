@@ -9,12 +9,13 @@ class Anggota extends Model
 {
     use HasFactory;
     protected $fillable = [
+        'nama_anggota',
         'jam_masuk',
         'jam_pulang',
         'jam_masuk_telat',
         'jam_pulang_telat',
         'jam_kerja',
-        'user_id'
+//        'user_id'
     ];
 
 }

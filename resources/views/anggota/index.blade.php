@@ -17,8 +17,9 @@
                 <thead>
                 <tr >
                     <th scope="col">#</th>
-                    <th scope="col">Nama</th>
-                    <th scope="col">Divisi</th>
+{{--                    <th scope="col">Nama</th>--}}
+{{--                    <th scope="col">Divisi</th>--}}
+                    <th scope="col">Nama Anggota</th>
                     <th scope="col">Jam Masuk</th>
                     <th scope="col">Jam Pulang</th>
                     <th scope="col">Jam Masuk Telat</th>
@@ -34,8 +35,9 @@
 
                     <tr>
                         <th scope="row">{{$key+1}}</th>
-                        <td>{{$d->name}}</td>
-                        <td>{{$d->divisi}}</td>
+{{--                        <td>{{$d->name}}</td>--}}
+{{--                        <td>{{$d->divisi}}</td>--}}
+                        <td>{{$d->nama_anggota}}</td>
                         <td>{{$d->jam_masuk}}</td>
                         <td>{{$d->jam_pulang}}</td>
                         <td>{{$d->jam_masuk_telat}}</td>
@@ -45,7 +47,7 @@
 
                         <td>
                             <div class="d-flex gap-3">
-                                <form action="{{route('destroy.user',$d->id)}}" method="post">
+                                <form action="{{route('anggota.destroy',$d->id)}}" method="post">
                                     @method('DELETE')
                                     @csrf()
                                     <button class="btn btn-danger">Delete</button>
@@ -63,6 +65,7 @@
             </table>
 
         </div>
+
         {{ $data->links() }}
     </div>
 

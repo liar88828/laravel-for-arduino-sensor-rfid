@@ -16,6 +16,7 @@ return new class extends Migration
             $table->date('tanggal')->nullable();
             $table->time('waktu_masuk')->nullable();
             $table->time('waktu_pulang')->nullable();
+            $table->string('keterangan')->nullable();
             $table->unsignedBigInteger('user_id')->nullable();
             $table->foreign('user_id')->references('id')->on('users');
             $table->timestamps();

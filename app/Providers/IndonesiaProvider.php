@@ -32,11 +32,11 @@ class IndonesiaProvider extends ServiceProvider
             \$phoneNumber = $expression;
             \$phoneNumberLength = strlen(\$phoneNumber);
             if (\$phoneNumberLength < 10) {
-                \$phoneNumber .= str_repeat('0', 10 - \$phoneNumberLength);
+                \$phoneNumber .= str_repeat('x', 10 - \$phoneNumberLength);
             } elseif (\$phoneNumberLength > 13) {
                 \$phoneNumber = substr(\$phoneNumber, 0, 13);
             } elseif (\$phoneNumberLength < 13) {
-                \$phoneNumber = str_pad(\$phoneNumber, 13, '0');
+                \$phoneNumber = str_pad(\$phoneNumber, 13, 'x');
             }
 
             echo (substr(\$phoneNumber, 0, 1) === '0')

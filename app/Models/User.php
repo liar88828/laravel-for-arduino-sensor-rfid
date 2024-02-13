@@ -26,8 +26,8 @@ class User extends Authenticatable
         'lahir',
         'divisi',
         'rfid',
-        'jenis_kelamin'
-
+        'jenis_kelamin',
+        'anggota_id'
     ];
 
     /**

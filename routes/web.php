@@ -29,6 +29,7 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('/create', 'store')->name('create');
 
     Route::get('/profile/', 'profile')->name('profile');
+    Route::get('/profile_check/{id}', 'profileCheck')->name('profile.check');
     Route::get('/logout', 'logout')->name('logout');
 //    --------
 
@@ -49,9 +50,11 @@ Route::prefix('/anggota')->group(function () {
         Route::get('/detail/{id}', 'show')->name('anggota.show');
         Route::get('/create', 'create')->name('anggota.create');
         Route::get('/edit/{id}', 'edit')->name('anggota.edit');
+        Route::get('/pilih/{id}', 'pilih')->name('anggota.pilih');
         //model
         Route::post('/store', 'store')->name('anggota.store');
         Route::put('/update/{id}', 'update')->name('anggota.update');
+        Route::put('/konfirmasi/{id}', 'konfirmasi')->name('anggota.konfirmasi');
         Route::delete('/destroy/{id}', 'destroy')->name('anggota.destroy');
     });
 });

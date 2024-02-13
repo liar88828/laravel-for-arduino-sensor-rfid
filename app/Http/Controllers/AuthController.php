@@ -19,34 +19,52 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
-    // Show Login Form
     public function profile()
     {
+        return view('auth.login');
+    }
+
+    // Show Login Form
+    public function profileCheck(string $id)
+    {
+        $user = User::query()->where('users.id', '=', $id)
+//            ->join('sensors', 'sensors.user_id', '=', 'users.id')
+//            ->join('anggotas', 'anggotas.id', '=', 'users.anggota_id')
+            ->first();
+
+        if ($user == null) {
+            return redirect()
+                ->route('list.user')
+                ->with('message', 'Data Tidak Ditemukan');
+        }
+
+        $anggota = Anggota::query()->where('anggotas.id', '=', $user['anggota_id'])
+//            ->join('sensors', 'sensors.user_id', '=', 'users.id')
+//            ->join('anggotas', 'anggotas.id', '=', 'users.anggota_id')
+            ->first();
+
+        $sensor = Sensor::query()->where('sensors.user_id', '=', $user['id'])
+//            ->join('sensors', 'sensors.user_id', '=', 'users.id')
+//            ->join('anggotas', 'anggotas.id', '=', 'users.anggota_id')
+            ->first();
+
+        $record = Record::query()->where('records.user_id', '=', $user['id'])
+//            ->join('sensors', 'sensors.user_id', '=', 'users.id')
+//            ->join('anggotas', 'anggotas.id', '=', 'users.anggota_id')
+            ->get();
 
 
-//        if (Auth::check()) {
-//            $users = auth()->user();
-//            $id = $users->id;
-//
-//            if ($users->role === 'anggota') {
-//                $datas = DB::table('users')
-//                    ->join('anggotas', 'users.id', '=', 'anggotas.id_user')
-//                    ->where('users.id', '=', $id)
-//                    ->select('users.email', 'anggotas.*')
-//                    ->first();
-////                dd($datas);
-//                return view('auth.profile',
-//                    ['datas' => $datas]);
-//            } else {
-//                $datas = DB::table('users')
-//                    ->join('petugas', 'users.id', '=', 'petugas.id_user')
-//                    ->where('id', '=', $id)
-//                    ->select('users.email', 'anggotas.*')
-//                    ->first();
-//                return view('auth.profile',
-//                    ['datas' => $datas]);
-//            }
-//        }
+//        dd($data);
+        return view(
+            'auth.profile',
+            [
+                'user' => $user,
+                'anggota' => $anggota,
+                'sensor' => $sensor,
+                'record' => $record,
+            ]
+        );
+
     }
 
     // Show Login Form
@@ -172,7 +190,7 @@ class AuthController extends Controller
 
     public function update(Request $request, string $id)
     {
-         $formFields = $request->validate([
+        $formFields = $request->validate([
             'name' => ['required', 'min:3'],
             'email' => ['required', 'email', 'min:3'],
             'password' => 'required|confirmed|min:6',
@@ -188,7 +206,7 @@ class AuthController extends Controller
         $formFields['password'] = bcrypt($formFields['password']);
 
         // Create User
-        $user = User::findOrFail($id);
+        $user = User::query()->findOrFail($id);
         $user->update([
             'name' => $formFields['name'],
             'email' => $formFields['email'],
@@ -200,12 +218,11 @@ class AuthController extends Controller
             'password' => $formFields['password'],
         ]);
 
-         Sensor::query()->where('user_id', '=', $user->id)
-            ->update(['rfid'=> $formFields['rfid']]);
+        Sensor::query()->where('user_id', '=', $user->id)
+            ->update(['rfid' => $formFields['rfid']]);
 
 //            findOrFail($user->id);
 //        $sensor->update(['rfid' => $formFields['rfid']]);
-
 
 
 //        auth()->login($user);

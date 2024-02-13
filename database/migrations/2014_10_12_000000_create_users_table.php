@@ -23,6 +23,12 @@ return new class extends Migration {
             $table->date('lahir');
             $table->string('divisi');
 //            $table->string('rfid')->unique()->nullable();
+            //
+//            ---relational
+            $table->unsignedBigInteger('anggota_id')->nullable();
+            $table->foreign('anggota_id')->references('id')->on('anggotas');
+
+
 // -----
             $table->rememberToken();
             $table->timestamps();

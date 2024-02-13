@@ -22,12 +22,13 @@ class StoreAnggotaRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'nama_anggota' => 'required|min:3',
             'jam_masuk' => 'required|sometimes',
             'jam_pulang' => 'required|sometimes',
             'jam_masuk_telat' => 'required|sometimes',
             'jam_pulang_telat' => 'required|sometimes',
             'jam_kerja' => 'required|min:1',
-            'user_id' => 'nullable',
+//            'user_id' => 'nullable',
         ];
     }
 }
