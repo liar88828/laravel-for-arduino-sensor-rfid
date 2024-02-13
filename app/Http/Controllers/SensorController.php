@@ -4,14 +4,11 @@ namespace App\Http\Controllers;
 
 
 use App\Http\Requests\StoreSensorRequest;
-use App\Models\Anggota;
+use App\Http\Requests\UpdateSensorRequest;
 use App\Models\Record;
 use App\Models\Sensor;
-use App\Http\Requests\UpdateSensorRequest;
 use App\Models\User;
 use Carbon\Carbon;
-use Carbon\Traits\Date;
-use Illuminate\Support\Facades\DB;
 
 class SensorController extends Controller
 {
@@ -138,80 +135,78 @@ class SensorController extends Controller
 
 // apa bila terdaftar maka cari record dengan user dan anggota
     $currentTime = Carbon::now();
+    $current = strtotime($currentTime->toTimeString());
 
-    //---create record
+    //---create record----
+
     // get record by sensor
-    $record = Record::findUserRecord($sensor['user_id']);
+    $record = Record::findByDateAndUserId($currentTime->toDateString(), $sensor['user_id']);
 
 
+    $anggota = User::query()->where('users.id', '=', $sensor['user_id'])
+      ->join('anggotas', 'anggotas.id', '=', 'users.anggota_id')
+      ->select('anggotas.*', 'users.name')
+      ->first();
 
+    if (empty($anggota)) {
+      return response()->json('Anggota Anda Tidak Terdaftar', 401);
+    }
 
     // apa bila record tidak ada
-    if (!$record) {
-      // untuk test saja pada record
-      Record::query()->create([
-        'keterangan' => 'Record Tersimpan',
-        'user_id' => $sensor['user_id']
-      ]);
-      return response()->json('Test Record Tersimpan', 200);
-    }
+    if (empty($record)) {
 
+      $startTime = strtotime($anggota['jam_masuk']);
+      $endTime = strtotime($anggota['jam_masuk_telat']);
 
-// check apa kah sama dengan tanggal sekarang
-    if ($currentTime->toDateString() === $record['tanggal']
-      && !is_null($record['waktu_masuk'])
-      && !is_null($record['waktu_pulang'])
-    ) {
-      return response()->json('Anda Sudah Absen Sebelumnya', 200);
-    }
+      // apabila tepat jam masuk di dalam jam telat
+      if ($current >= $startTime && $current <= $endTime) {
+//        return response()->json('test absen 1', 200);
 
-    if ($currentTime->toDateString() !== $record['tanggal']) {
+        Record::createMasuk('Tepat Waktu', $sensor['user_id']);
+        return response()->json('Absen Sukses Tercatat Rajin ' . $currentTime->toTimeString(), 200);
 
-      $current = strtotime($currentTime->toTimeString());
-      $anggota = Anggota::query()->where('id', '=', $record['anggota_id'])->first();
+        // apa bila di luar jam telat
+      } else {
+//        return response()->json('test absen 2', 200);
 
-      // check anggota masuk jam berapa
-      if ($record['waktu_masuk'] === null) {
-        $startTime = strtotime($anggota['jam_masuk']);
-        $endTime = strtotime($anggota['jam_masuk_telat']);
-
-        // apabila tepat jam masuk di dalam jam telat
-        if ($current >= $startTime && $current <= $endTime) {
-          return response()->json('test absen 1', 200);
-
-          Record::createMasuk('Tepat Waktu', $sensor['user_id']);
-          return response()->json('Absen Sukses Tercatat Rajin ' . $currentTime->toTimeString(), 200);
-
-          // apa bila di luar jam telat
-        } else {
-          return response()->json('test absen 2', 200);
-
-          Record::createMasuk('Telat Waktu', $sensor['user_id']);
-          return response()->json('Absen Sukses Tercatat Anda Telat ' . $currentTime->toTimeString(), 200);
-        }
+        Record::createMasuk('Telat Waktu', $sensor['user_id']);
+        return response()->json('Absen Sukses Tercatat Anda Telat ' . $currentTime->toTimeString(), 200);
       }
+
 
       // waktu pulang
-      if ($record['waktu_pulang'] === null) {
-        $startTime = strtotime($anggota['jam_pulang']);
-        $endTime = strtotime($anggota['jam_pulang_telat']);
+    } else if (!empty($record)) {
 
-        // apabila tepat jam pulang di dalam jam telat pulang
-        if ($current >= $startTime && $current <= $endTime) {
-          return response()->json('test absen 3', 200);
-
-          Record::createPulang($record['id']);
-          return response()->json('Selamat Pulang ' . $currentTime->toTimeString(), 200);
-
-        } else {
-          return response()->json('test absen 4', 200);
-
-          Record::createPulang($record['id']);
-          return response()->json('Selamat Lembur ' . $currentTime->toTimeString(), 200);
-        }
+      // check apa kah sama dengan tanggal sekarang
+      if ($currentTime->toDateString() === $record['tanggal']
+        && !is_null($record['waktu_masuk'])
+        && !is_null($record['waktu_pulang'])
+      ) {
+        return response()->json('Anda Sudah Absen Sebelumnya', 200);
       }
-      return response()->json('test absen 00', 200);
 
+
+      $startTime = strtotime($anggota['jam_pulang']);
+      $endTime = strtotime($anggota['jam_pulang_telat']);
+
+      if ($current < $startTime) {
+        return response()->json('Tidak Boleh Cabut', 200);
+      }
+
+      // apabila tepat jam pulang di dalam jam telat pulang
+      if ($current >= $startTime && $current <= $endTime) {
+//        return response()->json('test absen 3', 200);
+
+        Record::createPulang($record['id']);
+        return response()->json('Selamat Pulang ' . $currentTime->toTimeString(), 200);
+
+      } else {
+//        return response()->json('test absen 4', 200);
+
+        Record::createPulang($record['id']);
+        return response()->json('Selamat Lembur ' . $currentTime->toTimeString(), 200);
+      }
     }
+
   }
 }
