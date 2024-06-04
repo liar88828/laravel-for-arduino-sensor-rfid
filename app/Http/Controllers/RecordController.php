@@ -18,10 +18,10 @@ class RecordController extends Controller
 
         $data = Record::query()
             ->join('users', 'users.id', '=', 'records.user_id')
-            ->select(//'users.divisi',
-                'users.name', 'records.*')
+            ->join('sensors', 'sensors.user_id', '=', 'records.user_id')
+            ->select('users.name', 'records.*','sensors.rfid')
             ->paginate(10);
-
+//dd($data);
         return view('record.index',
             ['data' => $data]
         );
